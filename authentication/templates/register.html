@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block meta %}
+<title>Register - CAR SERVICE</title>
+{% endblock meta %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<div class="content-container d-flex align-items-center justify-content-center mx-auto">
+	<div class="container col-md-12">
+		<h2><strong>Register</strong></h2>
+		<a href="{% url 'authentication:register_technician' %}" class="btn btn-primary btn-custom btn-block">Tukang Service</a>
+        <a href="{% url 'authentication:register_staff' %}" class="btn btn-primary btn-custom btn-block">Staff</a>
+		{% comment %} <a href="{% url 'authentication:register_owner' %}" class="btn btn-primary btn-custom btn-block">Owner</a> {% endcomment %}
+	</div>
+</div>
+{% endblock content %}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+</head>
+<body>
+
+<h3>Link to Download Video</h3>
+<a href="{{weburl}}media/videos/{{filename}}" target="_blank">{{weburl}}media/videos/{{filename}}</a><br><br>
+
+<h3>Stream Video</h3>
+<video width="640" height="360" controls>
+    <source src="{{weburl}}media/videos/{{filename}}" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
+</body>
+</html>

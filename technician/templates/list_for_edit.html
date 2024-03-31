@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2 class="mt-3 text-white">Pilih untuk mengedit</h2>
+    <a href="{% url 'technician:dashboard_technician' %}" class="btn btn-primary mb-3">Back to Dashboard</a>
+    <div class="card-deck">
+        {% for car_service in car_services %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title"><strong>ID Car Service:</strong> {{ car_service.id }}</h5>
+                <p class="card-text"><strong>Nama Teknisi:</strong> {{ car_service.techinician_name }}</p>
+                <p class="card-text"><strong>Plat Nomor:</strong> {{ car_service.license_plate }}</p>
+                <p class="card-text"><strong>Merek/Tipe:</strong> {{ car_service.brand }}</p>
+                <p class="card-text"><strong>Part yang Service:</strong></p>
+                <ul class="list-unstyled">
+                    {% for part_to_service in car_service.part_to_service.all %}
+                        <li>• {{ part_to_service.parts_to_service }}</li>
+                    {% empty %}
+                        <li>No parts to service</li>
+                    {% endfor %}
+                </ul>
+                <p class="card-text"><strong>Foto Part:</strong></p>
+                <div>
+                    {% for part_to_service in car_service.part_to_service.all %}
+                        <img src="{{ part_to_service.car_photo.url }}" alt="{{ part_to_service.parts_to_service }} Photo" width="80" class="mr-2 mb-2">
+                    {% empty %}
+                        <p>No part photos</p>
+                    {% endfor %}
+                </div>
+                <p class="card-text"><strong>Tanggal Servis:</strong> {{ car_service.service_date }}</p>
+                <p class="card-text"><strong>Action:</strong> <a href="{% url 'technician:edit_service' car_service.id %}" class="btn btn-info">Edit</a></p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

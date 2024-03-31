@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>Edit Service Form - CAR SERVICE</title>
+{% endblock meta %}
+
+{% block content %}
+<div class="content-container d-flex align-items-center justify-content-center mx-auto">
+    <div class="container">
+        <h2>Edit Service Form</h2>
+        
+        {% if status == 'success' %}
+            <div class="alert alert-success">
+                Form Isian Telah Sukses Terubah
+            </div>
+        {% endif %}
+        
+        <a href="{% url 'technician:list_for_edit' %}" class="btn btn-danger mb-3">Cancel</a>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display: flex;" id="flex-container">
+            </div>
+            <button type="submit" class="btn btn-primary">Kirim</button>
+        </form>        
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        chooseColumnOrRow();
+
+        const partsContainer = document.getElementById('parts-container');
+        const numPartsInput = document.getElementById('num_parts');
+        const tanggalInput = document.getElementById('tanggal');  // Tambahkan ini
+        
+        // Set nilai default untuk input Tanggal
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const todayString = `${year}-${month}-${day}`;
+        // tanggalInput.value = todayString;
+        
+        const arrAwal = {{ text_name|safe }};
+        console.log(arrAwal);
+
+        function addInputFields(numParts) {
+            partsContainer.innerHTML = '';
+    
+            for (let i = 0; i < numParts; i++) {
+                if (i < arrAwal.length) {
+                    partsContainer.innerHTML += `
+                    <div class="form-group">
+                        <label for="part_to_service_${i}">Part ke-${i + 1}</label>
+                        <input type="text" value="${arrAwal[i]}" class="form-control" id="part_to_service_${i}" name="part_to_service_${i}" placeholder="Enter Part to Service">
+                    </div>
+                    <div class="form-group">
+                        <label for="car_photo_${i}">Ganti Foto Part ke-${i + 1}</label>
+                        <input type="file" class="form-control-file" id="car_photo_${i}" name="car_photo_${i}" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="car_video_${i}">[Tidak Wajib] Video Part ke-${i + 1}</label>
+                        <input type="file" class="form-control-file" id="car_video_${i}" name="car_video_${i}" accept="video/*">
+                    </div>
+                `;
+                } else {
+                    partsContainer.innerHTML += `
+                    <div class="form-group">
+                        <label for="part_to_service_${i}">Part ke-${i + 1}</label>
+                        <input type="text" class="form-control" id="part_to_service_${i}" name="part_to_service_${i}" placeholder="Enter Part to Service">
+                    </div>
+                    <div class="form-group">
+                        <label for="car_photo_${i}">Tambahkan Foto Part ke-${i + 1}</label>
+                        <input type="file" class="form-control-file" id="car_photo_${i}" name="car_photo_${i}" required accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="car_video_${i}">[Tidak Wajib] Video Part ke-${i + 1}</label>
+                        <input type="file" class="form-control-file" id="car_video_${i}" name="car_video_${i}" accept="video/*">
+                    </div>
+                `;
+                }
+            
+
+            }
+        }
+    
+        numPartsInput.addEventListener('change', function () {
+            const numParts = parseInt(numPartsInput.value);
+    
+            if (isNaN(numParts) || numParts < 1) {
+                numParts = 1;
+                numPartsInput.value = numParts;
+            }
+
+            addInputFields(numParts);
+        });
+    
+        addInputFields(parseInt(numPartsInput.value));
+        
+
+    });
+
+    function chooseColumnOrRow() {
+        const flexContainer = document.getElementById('flex-container');
+        if (window.innerWidth >= window.innerHeight) {
+            flexContainer.innerHTML = `<!-- Kolom Kiri -->
+                <div style="flex: 1; padding: 0 10px;">
+                    <div class="form-group">
+                        <label for="staff_service_name">Nama Tukang Servis</label>
+                        <input type="text" value="{{ car_service.techinician_name }}" class="form-control" id="staff_service_name" name="staff_service_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="license_plate">Plat Nomor</label>
+                        <input type="text" value="{{ car_service.license_plate }}" class="form-control" id="license_plate" name="license_plate" placeholder="Enter License Plate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="brand">Merek/Tipe</label>
+                        <input type="text" value="{{ car_service.brand }}" class="form-control" id="brand" name="brand" placeholder="Enter Car Brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone_number">No Telepon Tukang Servis</label>
+                        <input type="number" value="{{ car_service.techinician_phone }}" class="form-control" id="phone_number" name="phone_number" required value="{{ user_phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="tanggal">Tanggal Service</label>
+                        <input type="date" value="{{ converted_date }}" class="form-control" id="tanggal" name="tanggal" required>
+                    </div>
+                </div>
+                <!-- Kolom Kanan -->
+                <div style="flex: 1; padding: 0 10px;">
+                    <div class="form-group">
+                        <label for="num_parts">Jumlah of Part yang di Servis</label>
+                        <input type="number" value="{{ len_parts_to_service }}" class="form-control" id="num_parts" name="num_parts" required value="1">
+                    </div>
+                    <div id="parts-container">
+                    </div>
+                </div>`
+        } else {
+            flexContainer.innerHTML += `<!-- Kolom Kiri -->
+                <div style="flex: 1; padding: 0 10px;">
+                    <div class="form-group">
+                        <label for="staff_service_name">Nama Tukang Servis</label>
+                        <input type="text" value="{{ car_service.techinician_name }}" class="form-control" id="staff_service_name" name="staff_service_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="license_plate">Plat Nomor</label>
+                        <input type="text" value="{{ car_service.license_plate }}" class="form-control" id="license_plate" name="license_plate" placeholder="Enter License Plate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="brand">Merek/Tipe</label>
+                        <input type="text" value="{{ car_service.brand }}" class="form-control" id="brand" name="brand" placeholder="Enter Car Brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone_number">No Telepon Tukang Servis</label>
+                        <input type="number" value="{{ car_service.techinician_phone }}" class="form-control" id="phone_number" name="phone_number" required value="{{ user_phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="tanggal">Tanggal Service</label>
+                        <input type="date" value="{{ converted_date }}" class="form-control" id="tanggal" name="tanggal" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="num_parts">Jumlah of Part yang di Servis</label>
+                        <input type="number" value="{{ len_parts_to_service }}" class="form-control" id="num_parts" name="num_parts" required value="1">
+                    </div>
+                    <div id="parts-container">
+                    </div>
+                </div>`
+        }
+    }
+</script>
+    
+{% endblock content %}

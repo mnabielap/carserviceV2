@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2 class="mt-3 text-white">History Input Form</h2>
+    <div class="card-deck">
+        {% for car_service, status_car in car_services %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title"><strong>ID Car Service:</strong> {{ car_service.id }}</h5>
+                <p class="card-text"><strong>Nama Teknisi:</strong> {{ car_service.techinician_name }}</p>
+                <p class="card-text"><strong>Plat Nomor:</strong> {{ car_service.license_plate }}</p>
+                <p class="card-text"><strong>Merek/Tipe:</strong> {{ car_service.brand }}</p>
+                <p class="card-text"><strong>Part yang Di-Service:</strong></p>
+                <ul class="list-unstyled">
+                    {% for part_to_service in car_service.part_to_service.all %}
+                        <li style="margin-bottom: 25px;">
+                            • {{ part_to_service.parts_to_service }}. <br/> 
+                            {% if part_to_service.is_approved %}
+                            &#9989; Disetujui oleh {{ part_to_service.validated_by }}<br>
+                            <strong>Alasan:</strong> {{ part_to_service.reason }}
+                            {% elif part_to_service.is_rejected %}
+                            &#10060; Ditolak oleh {{ part_to_service.validated_by }};<br>
+                            <strong>Alasan:</strong> {{ part_to_service.reason }}
+                            {% endif %}
+                        </li>
+                    {% empty %}
+                        <li>No parts to service</li>
+                    {% endfor %}
+                </ul>
+                <p class="card-text"><strong>Foto Part:</strong></p>
+                <div>
+                    <img src="{{ car_service.part_to_service.all.0.car_photo.url }}" alt="{{ car_service.part_to_service.all.0.parts_to_service }} Photo" width="80" class="mr-2 mb-2">
+                </div>
+                <p class="card-text"><strong>Tanggal Servis:</strong> {{ car_service.service_date }}</p>
+                <p class="card-text"><strong>Status:</strong> {{ status_car }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

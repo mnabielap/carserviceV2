@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block meta %}
+<title>Dashboard Owner - CAR SERVICE</title>
+{% endblock meta %}
+
+{% block content %}
+<div class="content-container d-flex align-items-center justify-content-center mx-auto ">
+	<div class="container rounded mt-2 mb-2">
+		<div class="row align-items-center">
+			<div class="col-md-3 align-items-center">
+				<div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5 border border-secondary mb-2" width="150px" alt="default profile picture" src="https://static.vecteezy.com/system/resources/thumbnails/002/534/006/small/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg">
+					<span class="font-weight-bold" id="full-name"></span>
+					<span class="text-black-50" id="username1"></span>
+					<span class="fw-light" id="contributor"></span>
+				</div>
+			</div>
+			<div class="col-md-9">
+				<div class="d-flex justify-content-between align-items-center">
+					<h3><strong>Dashboard</strong></h3>
+				</div>
+				<div class="row mt-2">
+					<div class="col-md-12">
+                        <label class="labels">Username</label>
+                        <input type="text" aria-labelledby="nama" class="form-control" placeholder="" value="{{ username }}" id="nama" disabled="true">
+                    </div>
+				</div>
+				<div class="row mt-2">
+					<div class="col-md-12">
+                        <label class="labels">Status</label>
+                        <input type="text" aria-labelledby="negara" class="form-control" placeholder="" value="Owner" id="negara-edit" disabled="true">
+                    </div>
+				</div>
+				<div class="btn-toolbar mt-3 mx-3" role="toolbar" aria-label="Toolbar with button groups">
+					<div class="btn-group me-2" role="group" aria-label="First group">
+						<a href="{% url 'owner:list_all_service' %}" class="btn btn-primary btn-block">List Pekerjaan Servis</a>
+					</div>
+					<div class="btn-group me-2" role="group" aria-label="Second group">
+						<a href="/admin" class="btn btn-primary btn-block">Hapus User</a>
+					</div>
+					<div class="btn-group me-2" role="group" aria-label="Third group">
+						<a href="{% url 'owner:add_user' %}" class="btn btn-primary btn-block">Tambah User</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}

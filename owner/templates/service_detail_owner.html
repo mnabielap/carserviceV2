@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2 class="mt-3 text-white" style="margin-top: 10px;">Service Detail</h2>
+    <table class="table">
+        <tr>
+            <th>ID Car Service</th>
+            <td>{{ car_service.id }}</td>
+        </tr>
+        <tr>
+            <th>Username Pendaftar</th>
+            <td>{{ car_service.user.username }}</td>
+        </tr>
+        <tr>
+            <th>Plat Nomor</th>
+            <td>{{ car_service.license_plate }}</td>
+        </tr>
+        <tr>
+            <th>Merek / Tipe Mobil</th>
+            <td>{{ car_service.brand }}</td>
+        </tr>
+        <tr>
+            <th>Tanggal Servis</th>
+            <td>{{ car_service.service_date }}</td>
+        </tr>
+        <tr>
+            <th>Nama Tukang Servis</th>
+            <td>{{ car_service.techinician_name }}</td>
+        </tr>
+        <tr>
+            <th>Nomor Telepon Tukang Servis</th>
+            <td>{{ car_service.techinician_phone }}</td>
+        </tr>
+        <tr>
+            <th>Daftar Part Servis</th>
+            <td>
+                {% for part_to_service, videoname in parts_to_service_list %}
+                    <p>
+                        <strong>Nama Servis Part {{ forloop.counter }}:</strong><br>
+                        {{ part_to_service.parts_to_service }}
+                    </p>
+                    <p>
+                        <strong>Media Servis Part {{ forloop.counter }}:</strong><br>
+                        <img src="{{ part_to_service.car_photo.url }}" alt="{{ part_to_service.parts_to_service }} Photo" width="200"><br>
+                        <a href="{{ part_to_service.car_photo.url }}" target="_blank" class="btn btn-info">View Photo</a>
+                        {% if part_to_service.car_video %}
+                            <a href="{% url 'play_video' videoname %}" target="_blank" class="btn btn-info">View Video</a>
+                        {% endif %}
+                    </p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="car_service_id" value="{{ car_service.id }}">
+                        <input type="hidden" name="part_to_service_id" value="{{ part_to_service.id }}">
+                        {% if part_to_service.is_approved %}
+                            &#9989; Disetujui oleh {{ part_to_service.validated_by }}<br>
+                            <strong>Alasan:</strong> {{ part_to_service.reason }}
+                        {% elif part_to_service.is_rejected %}
+                            &#10060; Ditolak oleh {{ part_to_service.validated_by }};<br>
+                            <strong>Alasan:</strong> {{ part_to_service.reason }}
+                        {% else %}
+                            <button type="submit" name="action" value="approve" class="btn btn-success mb-3">Accept</button>
+                            <button type="submit" name="action" value="reject" class="btn btn-danger mb-3">Reject</button><br>
+                            <textarea id="txtReason" name="reason" placeholder="Alasan" class="form-control col-12 col-md-6" required></textarea>
+                        {% endif %}
+                    </form>
+                    <br>
+                    <br>
+                {% endfor %}
+            </td>
+        </tr>
+    </table>
+    <a href="{% url 'owner:list_all_service' %}" class="btn btn-primary">Kembali ke List Pekerjaan</a>
+
+    {% if is_completed %}
+        <a href="{% url 'staff:generate_pdf' car_service.id %}" class="btn btn-danger">Buat PDF</a>
+        <a href="{{ whatsapp_link }}" class="btn btn-success" target="_blank">Kirim Pesan WhatsApp</a>
+    {% endif %}
+    <p></p>
+</div>
+
+<script>
+    document.getElementById("txtReason").focus({ focusVisible: true });
+</script>
+
+{% endblock content %}

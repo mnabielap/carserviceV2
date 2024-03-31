@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2 class="mt-3 text-white">Daftar Pekerjaan Servis Mobil</h2>
+    <div class="card mb-2 bg-light">
+        <div class="row justify-content-center">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="technicianName">Filter Nama Teknisi:</label>
+                    <input type="text" id="technicianName" name="technicianName" class="form-control" oninput="filterTable()">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="licenseNumber">Filter Plat Nomor:</label>
+                    <input type="text" id="licenseNumber" name="licenseNumber" class="form-control" oninput="filterTable()">
+                </div>
+            </div>
+            <div class="col-md-2 mr-3">
+                <div class="form-group">
+                    <label for="serviceDate">Filter Tanggal Servis:</label>
+                    <input type="date" id="serviceDate" name="serviceDate" class="form-control" oninput="filterTable()">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="columnSelect">Urutkan Berdasarkan:</label>
+                    <select id="columnSelect" class="btn btn-secondary dropdown-toggle">
+                        <option value="id">Id</option>
+                        <option value="technician_name">Nama Teknisi</option>
+                        <option value="license_plate">Plat Nomor</option>
+                        <option value="brand">Merek/Tipe Mobil</option>
+                        <option value="service_date_formatted">Tanggal Service</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    <label for="orderSelect">Urutan:</label>
+                    <select id="orderSelect" class="btn btn-secondary dropdown-toggle">
+                        <option value="asc">Dari Atas</option>
+                        <option value="desc">Dari Bawah</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="pagination mb-2">
+                    <button onclick="prevPage()" class="btn btn-primary">Sebelumnya</button>
+                    <span id="currentPage" class="btn btn-outline-primary" disabled aria-disabled="true">1</span>
+                    <button onclick="nextPage()" class="btn btn-primary">Berikutnya</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table" id="serviceTable">
+            <thead>
+                <tr>
+                    <th>ID Car Service</th>
+                    <th>Nama Teknisi</th>
+                    <th>Plat Nomor</th>
+                    <th>Merek/Tipe</th>
+                    <th>Part yang Service</th>
+                    <th>Foto Part</th>
+                    <th>Tanggal Servis</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    var tableData = [];
+    var currentPage = 1;
+    var itemsPerPage = 10;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var columnSelect = document.getElementById("columnSelect");
+        var orderSelect = document.getElementById("orderSelect");
+
+        columnSelect.addEventListener("change", filterTable);
+        orderSelect.addEventListener("change", filterTable);
+
+        {% for car_service, service_date_formatted, status_now in car_services %}
+        tableData.push({
+            id: {{ car_service.id }},
+            user: '{{ car_service.user.username }}',
+            technician_name: '{{ car_service.techinician_name }}',
+            license_plate: '{{ car_service.license_plate }}',
+            brand: '{{ car_service.brand }}',
+            parts_to_service: [
+                {% for part_to_service in car_service.part_to_service.all %}
+                    '{{ part_to_service.parts_to_service }}',
+                {% endfor %}
+            ],
+            car_photos: [
+                {% for part_to_service in car_service.part_to_service.all %}
+                    '{{ part_to_service.car_photo.url }}',
+                {% endfor %}
+            ],
+            service_date: '{{ car_service.service_date }}',
+            service_detail_url: '{% url 'staff:service_detail' car_service.id %}',
+            status_now: '{{ status_now }}',
+            service_date_formatted: '{{ service_date_formatted }}'
+        });
+        {% endfor %}
+
+        updateCurrentPage();
+        filterTable();
+    });
+
+    function populateTable(tableData) {
+        var tableBody = document.getElementById("tableBody");
+        tableBody.innerHTML = "";
+    
+        // Iterate through the array and create table rows
+        tableData.forEach(function (car_service) {
+            var row = document.createElement("tr");
+            row.id = "data_table";
+            row.innerHTML = `
+                <td>${car_service.id}</td>
+                <td>${car_service.technician_name}</td>
+                <td>${car_service.license_plate}</td>
+                <td>${car_service.brand}</td>
+                <td>${car_service.parts_to_service.join("<br>") || 'No parts to service'}</td>
+                <td>${car_service.car_photos.slice(0,1).map(photo => `<img src="${photo}" alt="Part Photo" width="60"><br>`).join('') || 'No part photos'}</td>
+                <td>${car_service.service_date}</td>
+                <td>${car_service.status_now}</td>
+                <td>
+                    <a href="${car_service.service_detail_url}" class="btn btn-info">Detail</a>
+                    <form method="post" onsubmit="return confirmDelete()">
+                        {% csrf_token %}
+                        <button type="submit" name="delete" value="${car_service.id}" class="btn btn-danger">Hapus</button>
+                    </form>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function confirmDelete() {
+        return confirm("Are you sure you want to delete this entry?");
+    }
+
+    function filterTable() {
+        var technicianInput = document.getElementById("technicianName");
+        var licenseNumberInput = document.getElementById("licenseNumber");
+        var serviceDateInput = document.getElementById("serviceDate");
+        var technicianFilter = technicianInput.value.toUpperCase();
+        var licenseNumberFilter = licenseNumberInput.value.toUpperCase();
+        var serviceDateFilter = serviceDateInput.value;
+    
+        // Convert serviceDateFilter to the desired format (if needed)
+        if (serviceDateFilter) {
+            serviceDateFilter = formatDate(serviceDateFilter);
+        }
+    
+        var filteredData = tableData.filter(function (item) {
+            var isTechnicianMatch = (item.technician_name.toUpperCase().indexOf(technicianFilter) > -1) || !technicianFilter;
+            var isLicenseNumberMatch = (item.license_plate.toUpperCase().indexOf(licenseNumberFilter) > -1) || !licenseNumberFilter;
+            var isServiceDateMatch = (!serviceDateFilter || item.service_date.indexOf(serviceDateFilter) > -1);
+    
+            return isTechnicianMatch && isLicenseNumberMatch && isServiceDateMatch;
+        });
+
+        var selectedColumn = document.getElementById("columnSelect").value;
+        var selectedOrder = document.getElementById("orderSelect").value;
+
+        // Sort the filtered data based on the selected column and order
+        if (selectedOrder === "asc") {
+            filteredData.sort((a, b) => (a[selectedColumn] > b[selectedColumn]) ? 1 : -1);
+        } else {
+            filteredData.sort((a, b) => (a[selectedColumn] < b[selectedColumn]) ? 1 : -1);
+        }
+    
+        // Update your table or perform any necessary actions with the filtered data
+        // Adjust the range of items to display based on the current page
+        var startIndex = (currentPage - 1) * itemsPerPage;
+        var endIndex = startIndex + itemsPerPage;
+
+        // Populate the table with the filtered and paginated data
+        populateTable(filteredData.slice(startIndex, endIndex));
+    }
+
+    function updateCurrentPage() {
+        document.getElementById("currentPage").innerText = currentPage;
+    }
+
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            updateCurrentPage();
+            filterTable();
+        }
+    }
+
+    function nextPage() {
+        var maxPage = Math.ceil(tableData.length / itemsPerPage);
+        if (currentPage < maxPage) {
+            currentPage++;
+            updateCurrentPage();
+            filterTable();
+        }
+    }
+
+    function formatDate(inputDate) {
+        // Create a Date object from the input date string
+        var date = new Date(inputDate);
+
+        // Get the month name abbreviation
+        var monthNames = [
+            "Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.",
+            "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."
+        ];
+        var monthAbbreviation = monthNames[date.getMonth()];
+
+        // Get the day and year components
+        var day = date.getDate();
+        var year = date.getFullYear();
+
+        // Create the formatted date string
+        var formattedDate = monthAbbreviation + ' ' + day + ', ' + year;
+
+        return formattedDate;
+    }
+</script>
+
+{% endblock content %}
