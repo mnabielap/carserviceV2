@@ -25,6 +25,7 @@ def create_service_form(request):
         brand = request.POST.get('brand')
         techinician_name = request.POST.get('staff_service_name')
         techinician_phone = request.POST.get('phone_number')
+        kilometer = request.POST.get('kilometer')
         service_date = request.POST.get('tanggal')
 
         print(f"service_date: {service_date}")
@@ -35,6 +36,7 @@ def create_service_form(request):
             service_date=datetime.datetime.strptime(service_date, '%Y-%m-%d'),
             techinician_name=techinician_name,
             techinician_phone=techinician_phone,
+            kilometer=kilometer,
         )
 
         # Simpan PartToService berdasarkan jumlah yang diinginkan
@@ -118,6 +120,7 @@ def edit_service(request, service_id):
         techinician_name = request.POST.get('staff_service_name')
         techinician_phone = request.POST.get('phone_number')
         service_date = request.POST.get('tanggal')
+        kilometer = request.POST.get('kilometer')
 
         if car_service.license_plate != license_plate:
             car_service.license_plate = license_plate
@@ -129,6 +132,8 @@ def edit_service(request, service_id):
             car_service.techinician_phone = techinician_phone
         if car_service.service_date != service_date:
             car_service.service_date = service_date
+        if car_service.kilometer != kilometer:
+            car_service.kilometer = kilometer
         car_service.save()
 
         for i in range(num_parts):

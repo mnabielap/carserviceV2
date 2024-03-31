@@ -27,6 +27,7 @@
                         <p>No part photos</p>
                     {% endfor %}
                 </div>
+                <p class="card-text"><strong>Kilometer:</strong> {{ car_service.kilometer }}</p>
                 <p class="card-text"><strong>Tanggal Servis:</strong> {{ car_service.service_date }}</p>
                 <p class="card-text"><strong>Action:</strong> <a href="{% url 'technician:edit_service' car_service.id %}" class="btn btn-info">Edit</a></p>
             </div>

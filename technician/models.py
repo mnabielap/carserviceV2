@@ -8,6 +8,7 @@ class CarService(models.Model):
     service_date = models.DateField(default=None)
     techinician_name = models.CharField(max_length=100, default="None")  # Tambahkan field Nama Staff Service
     techinician_phone = models.CharField(max_length=15, default="None")  # Tambahkan field Nomor HP Tukang Service
+    kilometer = models.IntegerField(default=0)
     is_deleted = models.BooleanField(default=False)
 
     def __str__(self):

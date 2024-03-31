@@ -31,6 +31,7 @@
                         <option value="license_plate">Plat Nomor</option>
                         <option value="brand">Merek/Tipe Mobil</option>
                         <option value="service_date_formatted">Tanggal Servis</option>
+                        <option value="kilometer">Kilometer</option>
                         <option value="status_now">Status</option>
                     </select>
                 </div>
@@ -44,7 +45,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="d-flex justify-content-center">
                 <div class="pagination mb-2">
                     <button onclick="prevPage()" class="btn btn-primary">Sebelumnya</button>
                     <span id="currentPage" class="btn btn-outline-primary" disabled aria-disabled="true">1</span>
@@ -65,6 +66,7 @@
                     <th>Part yang Service</th>
                     <th>Foto Part</th>
                     <th>Tanggal Servis</th>
+                    <th>Kilometer</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
@@ -110,7 +112,8 @@
             service_date: '{{ car_service.service_date }}',
             service_detail_url: '{% url 'owner:service_detail' car_service.id %}',
             status_now: '{{ status_now }}',
-            service_date_formatted: '{{ service_date_formatted }}'
+            service_date_formatted: '{{ service_date_formatted }}',
+            kilometer: '{{ car_service.kilometer }}',
         });
         {% endfor %}
 
@@ -134,6 +137,7 @@
                 <td>${car_service.parts_to_service.join("<br>") || 'No parts to service'}</td>
                 <td>${car_service.car_photos.slice(0,1).map(photo => `<img src="${photo}" alt="Part Photo" width="60"><br>`).join('') || 'No part photos'}</td>
                 <td>${car_service.service_date}</td>
+                <td>${car_service.kilometer}</td>
                 <td style="color: ${car_service.status_now === 'Belum diputuskan' ? 'red' : 'inherit'}; font-weight: ${car_service.status_now === 'Belum diputuskan' ? 'bold' : 'normal'}">
                     ${car_service.status_now}
                 </td>

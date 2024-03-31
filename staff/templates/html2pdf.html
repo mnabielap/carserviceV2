@@ -14,7 +14,7 @@
             </td>
         </tr>
     </table>
-    <table class="table centered-align" border="0.001px">
+    <table class="table centered-align custom-table" border="0.001px">
         <tr>
             <th>ID Car Service</th>
             <td>{{ car_service.id }}</td>
@@ -76,6 +76,10 @@
     </table>
 </div>
 <style>
+.custom-table th {
+    width: 150px; /* Ganti nilai ini sesuai dengan lebar yang diinginkan */
+}
+
 th, td {
     padding: 2px; /* Tambahkan padding ke elemen th dan td */
 }
